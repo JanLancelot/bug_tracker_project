@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+<h2 class="mb-3">Projects</h2>
+{% if current_user.role == 'project_manager' or current_user.role == 'admin' %}
+<a href="{{ url_for('create_project') }}" class="btn btn-primary mb-3">Create Project</a>
+{% endif %}
+{% for project in projects %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">
+        <a href="{{ url_for('view_project', project_id=project.id) }}">{{ project.name }}</a>
+      </h5>
+      <p class="card-text">{{ project.description }}</p>
+    </div>
+  </div>
+{% else %}
+  <p>No projects found.</p>
+{% endfor %}
+{% endblock %}

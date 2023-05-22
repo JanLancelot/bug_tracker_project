@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<h1 class="mb-4">{{ project.name }}</h1>
+<p>{{ project.description }}</p>
+<a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn btn-primary">Edit</a>
+<form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" class="d-inline">
+  <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+<h2 class="mb-3">Bugs</h2>
+<form method="GET">
+  <input type="text" name="search_query" placeholder="Search for bugs">
+  <input type="submit" value="Search">
+</form>
+<form method="GET">
+  <label for="sort_by">Sort by:</label>
+  <select id="sort_by" name="sort_by">
+    <option value="id">ID</option>
+    <option value="title">Title</option>
+    <option value="priority">Priority</option>
+    <option value="status">Status</option>
+  </select>
+  <label for="priority_filter">Filter by priority:</label>
+  <select id="priority_filter" name="priority_filter">
+    <option value="">All</option>
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+    <option value="critical">Critical</option>
+  </select>
+  <label for="status_filter">Filter by status:</label>
+  <select id="status_filter" name="status_filter">
+    <option value="">All</option>
+    <option value="open">Open</option>
+    <option value="in_progress">In Progress</option>
+    <option value="closed">Closed</option>
+  </select>
+  <input type="submit" value="Apply">
+</form>
+<div class="row">
+  <div class="col">
+    {% for bug in bugs %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="{{ url_for('view_bug', project_id=project.id, bug_id=bug.id) }}">{{ bug.title }}</a>
+          </h5>
+          <p class="card-text">{{ bug.description }}</p>
+        </div>
+      </div>
+    {% else %}
+      <p>No bugs found.</p>
+    {% endfor %}
+    <a href="{{ url_for('create_bug', project_id=project.id) }}" class="btn btn-primary">Create Bug</a>
+  </div>
+  <div class="col">
+    <canvas id="bugsChart"></canvas>
+  </div>
+</div>
+
+<script>
+  const bugsPriorityCount = JSON.parse('{{ bugs_priority_count | tojson | safe }}');
+  const ctx = document.getElementById('bugsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: Object.keys(bugsPriorityCount),
+      datasets: [{
+        data: Object.values(bugsPriorityCount),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    }
+  });
+</script>
+{% endblock %}

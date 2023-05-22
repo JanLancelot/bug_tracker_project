@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="d-flex align-items-center justify-content-center" style="height: 80vh;">
+    <div>
+      <h1 class="text-center mb-4">Bug Tracker</h1>
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

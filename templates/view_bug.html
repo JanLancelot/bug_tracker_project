@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="mb-4">{{ bug.title }}</h1>
+  <p>{{ bug.description }}</p>
+  <p><b>Priority:</b> {{ bug.priority }}</p>
+  <p><b>Status:</b> {{ bug.status }}</p>
+  <p>
+    {% for attachment in attachments %}
+      <a href="{{ url_for('static', filename=attachment.filename) }}">{{ attachment.filename }}</a>
+    {% endfor %}
+  </p>
+  <a href="{{ url_for('edit_bug', project_id=project_id, bug_id=bug.id) }}" class="btn btn-primary">Edit</a>
+  <form method="POST" action="{{ url_for('delete_bug', project_id=project_id, bug_id=bug.id) }}" class="d-inline">
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </form>
+
+  <!-- Add a new form for comments -->
+  <h3 class="mt-5">Leave a comment</h3>
+  <form method="POST" action="{{ url_for('comment_on_bug', project_id=project_id, bug_id=bug.id) }}">
+    <div class="form-group">
+      <textarea name="comment" class="form-control" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <h3 class="mt-5">Comments</h3>
+  {% for comment in comments %}
+    <div class="card mb-2">
+      <div class="card-body">
+        <p>{{ comment.content }}</p>
+        <p><small>Posted by {{ comment.user.username }} on {{ comment.created_at.strftime('%Y-%m-%d') }}</small></p>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
+

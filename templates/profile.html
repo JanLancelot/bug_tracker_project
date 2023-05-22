@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>My Bugs</h1>
+{% for bug in bugs %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">
+        <a href="{{ url_for('view_bug', project_id=bug.project_id, bug_id=bug.id) }}">{{ bug.title }}</a>
+      </h5>
+      <p class="card-text">{{ bug.description }}</p>
+    </div>
+  </div>
+{% else %}
+  <p>No bugs assigned to you.</p>
+{% endfor %}
+{% endblock %}

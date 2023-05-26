@@ -168,7 +168,9 @@ def view_project(project_id):
     priority_filter = request.args.get('priority_filter')
     status_filter = request.args.get('status_filter')
     
-    bugs = Bug.query.filter_by(project_id=project.id)
+    bugs_query_base = Bug.query.filter_by(project_id=project.id)
+
+    bugs = bugs_query_base
 
     if search_query:
         bugs = bugs.filter(Bug.title.like(f'%{search_query}%'))
@@ -190,8 +192,21 @@ def view_project(project_id):
             bugs = bugs.order_by(Bug.id)
 
     bugs = bugs.all()
-    bugs_priority_count = db.session.query(Bug.priority, db.func.count(Bug.id)).group_by(Bug.priority).filter(Bug.project_id == project_id).all()
+
+    bugs_priority_count_query = bugs_query_base
+
+    if search_query:
+        bugs_priority_count_query = bugs_priority_count_query.filter(Bug.title.like(f'%{search_query}%'))
+
+    if priority_filter:
+        bugs_priority_count_query = bugs_priority_count_query.filter_by(priority=priority_filter)
+    
+    if status_filter:
+        bugs_priority_count_query = bugs_priority_count_query.filter_by(status=status_filter)
+
+    bugs_priority_count = bugs_priority_count_query.group_by(Bug.priority).values(Bug.priority, db.func.count(Bug.id))
     bugs_priority_count = dict(bugs_priority_count)
+
     return render_template('view_project.html', project=project, bugs=bugs, bugs_priority_count=bugs_priority_count)
 
 @app.route('/project/<int:project_id>/edit', methods=['GET', 'POST'])
